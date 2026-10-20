@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Sign in · CampusFlow{% endblock %}
+{% block content %}
+<section class="login-layout">
+  <div class="hero-panel clay">
+    <div class="eyebrow">YOUR CAMPUS, CONNECTED</div>
+    <h1>Learn more.<br><span>Show up.</span><br>Grow together.</h1>
+    <p>Attendance, academic resources, leave requests and assessments in one simple place.</p>
+    <div class="hero-orb orb-one"></div><div class="hero-orb orb-two"></div>
+  </div>
+  <form class="form-card clay" method="post">
+    <div class="eyebrow">WELCOME BACK</div><h2>Sign in</h2><p class="muted">Use the login ID provided by your college.</p>
+    <label>Login ID<input name="username" autocomplete="username" required autofocus></label>
+    <label>Password<input type="password" name="password" autocomplete="current-password" required></label>
+    <button class="primary" type="submit">Sign in <span>→</span></button>
+    <p class="tiny muted">New accounts must change their temporary password after first login.</p>
+  </form>
+</section>
+{% endblock %}

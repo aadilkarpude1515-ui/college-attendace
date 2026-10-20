@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Mark attendance{% endblock %}
+{% block content %}
+<div class="page-heading"><div><div class="eyebrow">CLASS RECORDS</div><h1>Mark attendance</h1><p class="muted">Select an assignment, date, and attendance status for each student.</p></div></div>
+<section class="panel clay">
+{% if assignments %}
+<form method="post" class="stack">
+<div class="form-grid"><label>Subject and batch<select name="assignment_id" id="assignment" required><option value="">Choose assignment</option>{% for a in assignments %}<option value="{{ a.id }}" data-subject="{{ a.subject_id }}" data-batch="{{ a.batch_id }}">{{ a.subject.name }} · {{ a.batch.name }}</option>{% endfor %}</select></label><label>Date<input type="date" name="session_date" value="{{ today.isoformat() }}" required></label></div>
+<p class="muted">First select the assignment, then load the roster.</p>
+<button type="button" class="secondary" onclick="loadRoster()">Load student roster</button>
+<div id="roster" class="empty">The roster will appear after you load it.</div>
+<div id="hidden-fields"></div>
+<button class="primary" type="submit" id="save" disabled>Save attendance</button>
+</form>
+<script>
+async function loadRoster() {
+  const select = document.getElementById('assignment');
+  const option = select.options[select.selectedIndex];
+  if (!option.value) { alert('Choose an assignment first.'); return; }
+  document.getElementById('roster').innerHTML = '<span class="spinner"></span> Loading roster…';
+  const res = await fetch('/teacher/roster?assignment_id=' + encodeURIComponent(option.value));
+  if (!res.ok) { alert('Could not load roster.'); return; }
+  const students = await res.json();
+  const roster = document.getElementById('roster');
+  const hidden = document.getElementById('hidden-fields');
+  hidden.innerHTML = '';
+  if (!students.length) { roster.textContent = 'No students found in this batch.'; return; }
+  roster.innerHTML = '<div class="table-wrap"><table><thead><tr><th>Student</th><th>Attendance status</th></tr></thead><tbody>' +
+    students.map(s => '<tr><td><b>' + escapeHtml(s.name) + '</b><small>' + escapeHtml(s.student_id) + '</small></td><td><select name="status_' + s.id + '"><option>Present</option><option>Absent</option><option>Late</option><option>Excused</option></select></td></tr>').join('') +
+    '</tbody></table></div>';
+  hidden.innerHTML = '<input type="hidden" name="subject_id" value="' + option.dataset.subject + '"><input type="hidden" name="batch_id" value="' + option.dataset.batch + '">';
+  document.getElementById('save').disabled = false;
+}
+function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+</script>
+{% else %}<div class="empty">No assignments have been assigned to you yet.</div>{% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Create quiz{% endblock %}
+{% block content %}
+<section class="narrow"><div class="eyebrow">ASSESSMENTS</div><h1>Create a quiz</h1><p class="muted">This starter version creates one multiple-choice question per quiz.</p>
+{% if assignments %}
+<form method="post" class="panel clay stack">
+<label>Assignment<select name="assignment_id" required>{% for a in assignments %}<option value="{{ a.id }}">{{ a.subject.name }} · {{ a.batch.name }}</option>{% endfor %}</select></label>
+<label>Quiz title<input name="title" required maxlength="150"></label><label>Instructions<textarea name="instructions" rows="2"></textarea></label>
+<div class="divider"></div><h2>Question 1</h2><label>Question<textarea name="question" required rows="3"></textarea></label>
+<div class="form-grid">{% for letter in ['A','B','C','D'] %}<label>Option {{ letter }}<input name="option_{{ letter }}" required></label>{% endfor %}</div>
+<div class="form-grid"><label>Correct option<select name="correct">{% for letter in ['A','B','C','D'] %}<option>{{ letter }}</option>{% endfor %}</select></label><label>Marks<input name="marks" type="number" min="1" max="100" value="1"></label></div>
+<button class="primary">Create quiz</button></form>
+{% else %}<div class="panel clay empty">You need an assigned subject and batch before creating quizzes.</div>{% endif %}</section>
+{% endblock %}

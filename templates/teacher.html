@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Teacher dashboard{% endblock %}
+{% block content %}
+<div class="page-heading"><div><div class="eyebrow">TEACHER WORKSPACE</div><h1>Welcome, {{ teacher.name }}</h1><p class="muted">Manage only your assigned subjects and batches.</p></div><span class="pill">Teacher</span></div>
+<div class="stats-grid"><div class="stat clay"><span>Teaching assignments</span><strong>{{ assignments|length }}</strong><small>Subject and batch combinations</small></div><div class="stat clay"><span>Pending leave requests</span><strong>{{ pending|length }}</strong><small>For batches where you are class teacher</small></div><div class="stat clay"><span>Quizzes created</span><strong>{{ quizzes|length }}</strong><small>Your assessments</small></div></div>
+<div class="two-col">
+<section class="panel clay"><div class="section-head"><div><h2>Your assignments</h2><p class="muted">Choose an assignment to mark attendance.</p></div><a class="small-button" href="{{ url_for('mark_attendance') }}">Mark attendance</a></div>
+{% for a in assignments %}<div class="list-item"><div><b>{{ a.subject.name }}</b><small>{{ a.subject.code }} · Semester {{ a.subject.semester.number }}</small></div><span class="pill">{{ a.batch.name }}</span></div>{% else %}<div class="empty">No assignments yet. Ask an admin to assign subjects and batches.</div>{% endfor %}
+<a class="text-link" href="{{ url_for('create_quiz') }}">Create a quiz →</a>
+</section>
+<section class="panel clay"><div class="section-head"><div><h2>Leave approvals</h2><p class="muted">Only class teachers can approve or reject.</p></div></div>
+{% for l in pending %}<div class="leave-card"><div><b>{{ l.student.name }}</b><small>{{ l.student.batch.name }} · {{ l.start_date }} – {{ l.end_date }}</small><p>{{ l.reason }}</p></div><form method="post" action="{{ url_for('review_leave', leave_id=l.id) }}" class="stack"><input name="comment" placeholder="Optional comment"><div class="button-row"><button name="status" value="Approved" class="primary">Approve</button><button name="status" value="Rejected" class="danger">Reject</button></div></form></div>{% else %}<div class="empty">No pending requests for your class-teacher assignments.</div>{% endfor %}
+</section></div>
+{% endblock %}

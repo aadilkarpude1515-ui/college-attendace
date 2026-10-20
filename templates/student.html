@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Student dashboard{% endblock %}
+{% block content %}
+<div class="page-heading"><div><div class="eyebrow">STUDENT SPACE</div><h1>Hello, {{ student.name }} 👋</h1><p class="muted">{{ student.student_id }} · Batch {{ student.batch.name }} · PRN ending {{ student.prn[-3:] }}</p></div><span class="pill">Student</span></div>
+<div class="stats-grid">
+  <div class="stat clay"><span>Overall attendance</span><strong>{{ overall }}%</strong><small>{{ attended }} attended out of {{ total }} recorded sessions</small></div>
+  <div class="stat clay"><span>Subjects tracked</span><strong>{{ stats|length }}</strong><small>Based on recorded attendance</small></div>
+  <div class="stat clay"><span>Pending leave</span><strong>{{ leaves|selectattr('status','equalto','Pending')|list|length }}</strong><small>Applications awaiting review</small></div>
+</div>
+<section class="panel clay">
+  <div class="section-head"><div><h2>Subject attendance</h2><p class="muted">Attendance is based on saved class sessions.</p></div></div>
+  {% if stats %}
+  <div class="table-wrap"><table><thead><tr><th>Subject</th><th>Attended</th><th>Classes</th><th>Attendance</th></tr></thead><tbody>
+  {% for s in stats %}<tr><td><b>{{ s.subject.name }}</b><small>{{ s.subject.code }} · Semester {{ s.subject.semester.number }}</small></td><td>{{ s.attended }}</td><td>{{ s.total }}</td><td><div class="progress-line"><span style="width:{{ s.pct }}%"></span></div><b>{{ s.pct }}%</b></td></tr>{% endfor %}
+  </tbody></table></div>
+  {% else %}<div class="empty">No attendance has been recorded for your account yet.</div>{% endif %}
+</section>
+<div class="two-col">
+<section class="panel clay"><div class="section-head"><div><h2>Apply for leave</h2><p class="muted">Your assigned class teacher reviews the request.</p></div></div>
+<form method="post" action="{{ url_for('apply_leave') }}" class="stack">
+<label>From<input type="date" name="start_date" required></label><label>To<input type="date" name="end_date" required></label><label>Reason<textarea name="reason" rows="3" required maxlength="1000"></textarea></label><button class="primary">Submit request</button></form>
+<h3 class="subheading">Your requests</h3>
+{% for l in leaves %}<div class="list-item"><div><b>{{ l.start_date }} – {{ l.end_date }}</b><small>{{ l.reason }}</small>{% if l.review_comment %}<small>Comment: {{ l.review_comment }}</small>{% endif %}</div><span class="status {{ l.status|lower }}">{{ l.status }}</span></div>{% else %}<p class="muted">No leave applications yet.</p>{% endfor %}
+</section>
+<section class="panel clay"><div class="section-head"><div><h2>Quizzes</h2><p class="muted">Assessments assigned to your batch.</p></div></div>
+{% for q in quizzes %}<div class="list-item"><div><b>{{ q.title }}</b><small>{{ q.subject.name }} · {{ q.questions|length }} question(s)</small>{% if q.deadline %}<small>Deadline: {{ q.deadline }}</small>{% endif %}</div>{% if attempts.get(q.id) %}<span class="status approved">Score {{ attempts[q.id].score }}</span>{% else %}<a class="small-button" href="{{ url_for('take_quiz', quiz_id=q.id) }}">Start</a>{% endif %}</div>{% else %}<div class="empty">No quizzes available yet.</div>{% endfor %}
+<a class="text-link" href="{{ url_for('student_syllabus') }}">Browse syllabus →</a>
+</section>
+</div>
+{% endblock %}

@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#eef1fb">
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+  <title>{% block title %}CampusFlow{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="{{ url_for('index') }}"><span class="brand-icon">✦</span> CampusFlow</a>
+  {% if current_user.is_authenticated %}
+  <nav>
+    {% if current_user.role == 'student' %}
+      <a href="{{ url_for('student_dashboard') }}">Dashboard</a><a href="{{ url_for('student_syllabus') }}">Syllabus</a>
+    {% elif current_user.role == 'teacher' %}
+      <a href="{{ url_for('teacher_dashboard') }}">Dashboard</a><a href="{{ url_for('mark_attendance') }}">Attendance</a><a href="{{ url_for('create_quiz') }}">Create quiz</a>
+    {% else %}<a href="{{ url_for('admin_dashboard') }}">Admin</a>{% endif %}
+    <a href="{{ url_for('change_password') }}">Account</a><a href="{{ url_for('logout') }}">Sign out</a>
+  </nav>
+  {% endif %}
+</header>
+<main class="page">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}{% for category, message in messages %}
+      <div class="flash {{ category }}">{{ message }}</div>
+    {% endfor %}{% endif %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</main>
+<footer>CampusFlow · College Attendance Portal</footer>
+</body>
+</html>

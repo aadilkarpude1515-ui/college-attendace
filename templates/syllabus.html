@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Syllabus{% endblock %}
+{% block content %}
+<div class="page-heading"><div><div class="eyebrow">LEARNING RESOURCES</div><h1>Semester syllabus</h1><p class="muted">Browse syllabus entries uploaded by your college admin.</p></div></div>
+<section class="panel clay">
+{% for item in items %}
+<div class="list-item"><div><b>{{ item.title }}</b><small>{{ item.subject.name }} · {{ item.subject.code }} · Semester {{ item.subject.semester.number }}</small>{% if item.content %}<p>{{ item.content }}</p>{% endif %}</div>{% if item.filename %}<a class="small-button" href="{{ url_for('uploaded_file', filename=item.filename) }}">Download</a>{% endif %}</div>
+{% else %}<div class="empty">No syllabus entries have been uploaded yet.</div>{% endfor %}
+</section>
+{% endblock %}
